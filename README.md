@@ -1,6 +1,6 @@
 # WebTable
 
-![image-20220721170542860](C:\Users\29592\AppData\Roaming\Typora\typora-user-images\image-20220721170542860.png)
+![show_pic](C:\Users\29592\Desktop\web\js_table\show_pic.png)
 
 介绍：一个简单的由JavaScript实现的网页动态表格，可支持显示文本和按钮。
 
