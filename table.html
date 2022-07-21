@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+
 <body>
     <table id="app">
 
@@ -13,34 +15,51 @@
 
     <script>
         var test_data = {
-            header:[
+            header: [
                 {
-                    name:'category01',
-                    type:'number'
+                    name: 'category01',
+                    type: 'number'
                 },
                 {
-                    name:'category02',
-                    type:'text'
+                    name: 'category02',
+                    type: 'text'
                 },
                 {
-                    name:'category03',
-                    type:'number'
+                    name: 'category03',
+                    type: 'button'
                 }
             ],
-            content:[
-                [1,'你好',2],
-                [3,'hello',4],
-                [5,'halo',6],
-                [7,'こんにちは',8]
+            content: [
+                [1, '你好', {btn_id:'edit',btn_name:'编辑',btn_type:'edit'}],
+                [3, 'hello', {btn_id:'del',btn_name:'删除',btn_type:'del'}],
+                [5, 'halo', {btn_id:'edit',btn_name:'编辑',btn_type:'edit'}],
+                [7, 'こんにちは', {btn_id:'add',btn_name:'添加',btn_type:'add'}]
             ]
         }
-        function ZTable(data,id){
+        function ZTable(data, id,
+            tr_th_class = 'class_tr_th', tr_th_id = 'id_tr_th',
+            tr_td_class = 'class_tr_td',
+            tr_td_id = 'id_tr_td',
+            td_class = 'class_td', td_id = 'id_td',
+            th_class = 'class_th', th_id = 'id_th',
+            tx_th_class = 'class_tx_th', tx_th_id = 'id_tx_th',
+            tx_td_class = 'class_tx_td', tx_td_id = 'id_tx_td') {
             this.raw_data = data
             this.header_data = data.header
             this.content_data = data.content
             this.id = id
+
+            this.tr_th_class = tr_th_class
+            this.tr_th_id = tr_th_id
+            this.tr_td_class = tr_td_class
+            this.tr_td_id = tr_td_id
+            this.td_class = td_class
+            this.td_id = td_id
+            this.th_class = th_class
+            this.th_id = th_id
+
             var container = document.getElementById(this.id)
-            this.init = function(){
+            this.init = function () {
                 console.log('start')
                 //解析数据，验证其正确性
                 //类型
@@ -52,50 +71,97 @@
             }
 
             //创建表格
-            this.create_table = function(){
+            this.create_table = function () {
                 this.create_headers()
                 this.create_content()
             }
 
             //创建表头
-            this.create_headers = function(){
+            this.create_headers = function () {
                 var _data = []
-                for(i = 0;i < this.header_data.length;i++){
+                var _type = []
+                for (i = 0; i < this.header_data.length; i++) {
                     _data.push(this.header_data[i].name)
+                    _type.push(this.header_data[i].type)
                 }
-                var tr_th = this.create_one_line(_data,'th')
+                this.header_name = _data
+                this.header_type = _type
+                var tr_th = this.create_one_line(_data, 'th')
                 container.appendChild(tr_th)
             }
 
             //创建表体
-            this.create_content = function(){
-                for(idx = 0;idx <this.content_data.length;idx++){
-                    var tr_td = this.create_one_line(this.content_data[idx],'td')
+            this.create_content = function () {
+                for (idx = 0; idx < this.content_data.length; idx++) {
+                    var tr_td = this.create_one_line(this.content_data[idx], 'td')
                     container.appendChild(tr_td)
                 }
             }
 
             //创建一行
-            this.create_one_line = function(line_data,_label){
+            this.create_one_line = function (line_data, _label) {
                 var tr = document.createElement('tr')
-                for(i = 0;i < line_data.length;i++){
-                    var t_label = document.createElement(_label)
-                    var text = document.createTextNode(String(line_data[i]))
-                    // if(typeof(line_data[i]) == String){
-                    //     text = document.createTextNode(line_data[i])
-                    // }else if(typeof(line_data[i]) == Number){
-                    //     text = document.createTextNode(String(line_data[i]))
-                    // }
-                    t_label.appendChild(text)
-                    tr.appendChild(t_label)
+                if (_label === 'td') {
+                    tr.className = this.tr_td_class
+                    tr.id = this.tr_td_id
+                    for (i = 0; i < line_data.length; i++) {
+                        //创建元素
+                        var t_label = document.createElement(_label)
+                        //赋予class 和 id
+                        t_label.className = this.td_class
+                        t_label.id = this.td_id
+                        //创建textnode
+                        // var text = document.createTextNode(String(line_data[i]))
+                        var text = this.create_text(line_data[i],i)
+                        //将textnode接到td上
+                        t_label.appendChild(text)
+                        //将td接到tr上
+                        tr.appendChild(t_label)
+                    }
+
+                } else if (_label === 'th') {
+                    tr.className = this.tr_th_class
+                    tr.id = this.tr_th_id
+                    for (i = 0; i < line_data.length; i++) {
+                        //创建元素
+                        var t_label = document.createElement(_label)
+                        //赋予class 和 id
+                        t_label.className = this.th_class
+                        t_label.id = this.th_id
+                        //创建textnode
+                        var text = document.createTextNode(String(line_data[i]))
+                        // var text = this.create_text(line_data[i],i)
+                        //将textnode接到td上
+                        t_label.appendChild(text)
+                        //将td接到tr上
+                        tr.appendChild(t_label)
+                    }
                 }
                 return tr
             }
+
+            this.create_text = function(elem_data,idx){
+                elem_type = this.header_type[idx]
+                var tx
+                if(elem_type === 'button'){
+                    tx = document.createElement('button')
+                    tx.className = 'ztable_btn'
+                    tx.id = elem_data.btn_id
+                    var text = document.createTextNode(elem_data.btn_name)
+                    tx.appendChild(text)
+                }else if(elem_type === 'number'){
+                    tx = document.createTextNode(String(elem_data))
+                }else if(elem_type === 'text'){
+                    tx = document.createTextNode(elem_data)
+                }
+                return tx
+            }
         }
-        table = new ZTable(test_data,'app')
+        table = new ZTable(test_data, 'app')
         table.init()
     </script>
 
 
 </body>
+
 </html>
