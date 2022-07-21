@@ -36,7 +36,7 @@
                 [7, 'こんにちは', {btn_id:'add',btn_name:'添加',btn_type:'add'}]
             ]
         }
-        function ZTable(data, id,
+        function WebTable(data, id,
             tr_th_class = 'class_tr_th', tr_th_id = 'id_tr_th',
             tr_td_class = 'class_tr_td',
             tr_td_id = 'id_tr_td',
@@ -58,7 +58,7 @@
             this.th_class = th_class
             this.th_id = th_id
 
-            var container = document.getElementById(this.id)
+            this.container = document.getElementById(this.id)
             this.init = function () {
                 console.log('start')
                 //解析数据，验证其正确性
@@ -87,15 +87,30 @@
                 this.header_name = _data
                 this.header_type = _type
                 var tr_th = this.create_one_line(_data, 'th')
-                container.appendChild(tr_th)
+                this.container.appendChild(tr_th)
             }
 
             //创建表体
             this.create_content = function () {
                 for (idx = 0; idx < this.content_data.length; idx++) {
                     var tr_td = this.create_one_line(this.content_data[idx], 'td')
-                    container.appendChild(tr_td)
+                    this.container.appendChild(tr_td)
                 }
+            }
+
+            //删除特定一行
+            this.del_idx_line = function(idx){
+                this.del_all()
+                this.content_data.splice(idx,1)
+                this.create_content()
+            }
+
+            //删除一行
+            this.del_line = function(object){
+                all_btns = Array.from(document.getElementsByClassName('webtable_btn'))
+                btn_idx = all_btns.indexOf(object)
+                this.del_idx_line(btn_idx)
+                // alert("shanchu")
             }
 
             //创建一行
@@ -140,25 +155,55 @@
                 return tr
             }
 
+            //创建一个单元格
             this.create_text = function(elem_data,idx){
                 elem_type = this.header_type[idx]
                 var tx
                 if(elem_type === 'button'){
                     tx = document.createElement('button')
-                    tx.className = 'ztable_btn'
+                    tx.className = 'webtable_btn'
                     tx.id = elem_data.btn_id
+                    //给按钮加入文字
                     var text = document.createTextNode(elem_data.btn_name)
                     tx.appendChild(text)
+                    //给按钮绑定事件
+                    if(elem_data.btn_type === 'edit'){
+                        tx.addEventListener("click",function(){
+                            alert('编辑')
+                        })
+                    }else if(elem_data.btn_type === 'add'){
+                        tx.addEventListener("click",function(){
+                            alert('添加')
+                        })
+                    }else if(elem_data.btn_type === 'del'){
+                        var that = this
+                        tx.addEventListener("click",function(){
+                            that.del_line(this)
+                        })
+                    }
                 }else if(elem_type === 'number'){
                     tx = document.createTextNode(String(elem_data))
                 }else if(elem_type === 'text'){
                     tx = document.createTextNode(elem_data)
                 }
                 return tx
+            }            
+
+            this.del_all = function(){
+                var child_list = document.getElementsByClassName(this.tr_td_class)
+                length = child_list.length
+                for(i = 0;i < length;i++){
+                    this.container.removeChild(child_list[0])
+                }
+                // this.container.removeChild(child_list)
             }
+
+
         }
-        table = new ZTable(test_data, 'app')
+        table = new WebTable(test_data, 'app')
         table.init()
+
+        // table.del_all()
     </script>
 
 
