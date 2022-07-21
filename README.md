@@ -1,6 +1,6 @@
 # WebTable
 
-![show_pic](C:\Users\29592\Desktop\web\js_table\show_pic.png)
+![show_pic](show_pic.png)
 
 介绍：一个简单的由JavaScript实现的网页动态表格，可支持显示文本和按钮。
 
