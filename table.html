@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <table id="app">
+
+    </table>
+
+    <script>
+        var test_data = {
+            header:[
+                {
+                    name:'category01',
+                    type:'number'
+                },
+                {
+                    name:'category02',
+                    type:'text'
+                },
+                {
+                    name:'category03',
+                    type:'number'
+                }
+            ],
+            content:[
+                [1,'你好',2],
+                [3,'hello',4],
+                [5,'halo',6],
+                [7,'こんにちは',8]
+            ]
+        }
+        function ZTable(data,id){
+            this.raw_data = data
+            this.header_data = data.header
+            this.content_data = data.content
+            this.id = id
+            var container = document.getElementById(this.id)
+            this.init = function(){
+                console.log('start')
+                //解析数据，验证其正确性
+                //类型
+
+                //规格
+
+                //开始生成表格
+                this.create_table()
+            }
+
+            //创建表格
+            this.create_table = function(){
+                this.create_headers()
+                this.create_content()
+            }
+
+            //创建表头
+            this.create_headers = function(){
+                var _data = []
+                for(i = 0;i < this.header_data.length;i++){
+                    _data.push(this.header_data[i].name)
+                }
+                var tr_th = this.create_one_line(_data,'th')
+                container.appendChild(tr_th)
+            }
+
+            //创建表体
+            this.create_content = function(){
+                for(idx = 0;idx <this.content_data.length;idx++){
+                    var tr_td = this.create_one_line(this.content_data[idx],'td')
+                    container.appendChild(tr_td)
+                }
+            }
+
+            //创建一行
+            this.create_one_line = function(line_data,_label){
+                var tr = document.createElement('tr')
+                for(i = 0;i < line_data.length;i++){
+                    var t_label = document.createElement(_label)
+                    var text = document.createTextNode(String(line_data[i]))
+                    // if(typeof(line_data[i]) == String){
+                    //     text = document.createTextNode(line_data[i])
+                    // }else if(typeof(line_data[i]) == Number){
+                    //     text = document.createTextNode(String(line_data[i]))
+                    // }
+                    t_label.appendChild(text)
+                    tr.appendChild(t_label)
+                }
+                return tr
+            }
+        }
+        table = new ZTable(test_data,'app')
+        table.init()
+    </script>
+
+
+</body>
+</html>
