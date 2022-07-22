@@ -1,4 +1,4 @@
-function WebTable(data, id,show_line_num = 10,
+function WebTable(data, id, show_line_num = 10,
     table_class_name = 'WebTable',
     tr_th_class = 'raw_tr_th',
     tr_td_class = 'raw_tr_td',
@@ -33,7 +33,7 @@ function WebTable(data, id,show_line_num = 10,
         this.create_table()
 
         //生成底部页码等
-        if(this.raw_content_data.length > this.show_line_num){
+        if (this.raw_content_data.length > this.show_line_num) {
             //数据数大于要展示的数量需要显示页码
             this.create_botton_menu()
         }
@@ -48,7 +48,7 @@ function WebTable(data, id,show_line_num = 10,
     }
 
     //创建表格标签
-    this.init_table_tab = function(){
+    this.init_table_tab = function () {
         this.container = document.createElement('table')
         this.container.className = this.table_class_name
         this.div_container.appendChild(this.container)
@@ -72,34 +72,34 @@ function WebTable(data, id,show_line_num = 10,
     }
 
     //初始化要展示的数据
-    this.init_show_content_data = function(){
+    this.init_show_content_data = function () {
         //当前的页码，初始为0
         this.cur_page = 0
         this.update_show_content_data(0)
     }
 
     //更新表格显示
-    this.update_table_content_show = function(){
+    this.update_table_content_show = function () {
         this.update_show_content_data(this.cur_page)
         this.del_all()
         this.create_content()
     }
 
     //更新要展示的数据
-    this.update_show_content_data = function(page){
+    this.update_show_content_data = function (page) {
         //最大的页数，可能会有空缺，从0开始计
-        
-        if(page > this.max_page){
+
+        if (page > this.max_page) {
             alert("Error: update_show_content_data::page > max_page")
         }
         var start = page * this.show_line_num
         var end
-        if(page === this.max_page){
+        if (page === this.max_page) {
             end = this.raw_content_data.length
-        }else{
+        } else {
             end = this.show_line_num + start
         }
-        this.content_data = this.raw_content_data.slice(start,end)
+        this.content_data = this.raw_content_data.slice(start, end)
     }
 
     //创建表体
@@ -111,92 +111,163 @@ function WebTable(data, id,show_line_num = 10,
     }
 
     //创建底部菜单
-    this.create_botton_menu = function(){
+    this.create_botton_menu = function () {
         var par_this = this
         var bottom_div = document.createElement('div')
         bottom_div.className = 'bottom_menu'
 
-        var previous_btn = this.create_sigle_button(btn_name='上一页',
-        btn_class='bottom_btn',
-        btn_id='previous_btn',
-        func=par_this.on_click_previous_btn
+
+        var previous_btn = this.create_sigle_button({
+            value: '上一页',
+            className: 'bottom_btn',
+            id: 'previous_btn',
+            func: par_this.on_click_previous_btn
+        }
         )
 
-        var next_btn = this.create_sigle_button(btn_name='下一页',
-        btn_class='bottom_btn',
-        btn_id='next_btn',
-        func=par_this.on_click_next_btn
+        var next_btn = this.create_sigle_button({
+            value: '下一页',
+            className: 'bottom_btn',
+            id: 'next_btn',
+            func: par_this.on_click_next_btn
+        }
         )
 
-        var first_page_btn = this.create_sigle_button(btn_name='第一页',
-        btn_class='bottom_btn',
-        btn_id='first_page_btn',
-        func=par_this.on_click_first_page_btn
+        var first_page_btn = this.create_sigle_button({
+            value: '第一页',
+            className: 'bottom_btn',
+            id: 'first_page_btn',
+            func: par_this.on_click_first_page_btn
+        }
         )
 
-        var last_page_btn = this.create_sigle_button(btn_name='最后一页',
-        btn_class='bottom_btn',
-        btn_id='last_page_btn',
-        func=par_this.on_click_last_page_btn
+        var last_page_btn = this.create_sigle_button({
+            value: '最后一页',
+            className: 'bottom_btn',
+            id: 'last_page_btn',
+            func: par_this.on_click_last_page_btn
+        }
         )
+
+        this.page_input = this.create_input({
+            className: 'bottom_input',
+            id: 'page_num_input',
+            value: '1',
+            onchange: this.on_bottom_input_value_change.bind(this),
+            type: 'number',
+        }
+        )
+
+        this.total_page_div = document.createElement('div')
+        this.total_page_text = document.createTextNode('/' + String(this.max_page+1))
+        this.total_page_div.appendChild(this.total_page_text)
 
         bottom_div.appendChild(first_page_btn)
         bottom_div.appendChild(previous_btn)
         bottom_div.appendChild(next_btn)
         bottom_div.appendChild(last_page_btn)
+        bottom_div.appendChild(this.page_input)
+        bottom_div.appendChild(this.total_page_div)
 
         this.div_container.appendChild(bottom_div)
     }
 
-    this.on_click_previous_btn = function(){
+    this.on_click_previous_btn = function () {
         // alert("previous")
-        if(this.cur_page > 0){
+        if (this.cur_page > 0) {
             this.cur_page--
             this.update_table_content_show()
+            this.update_page_show()
         }
     }
 
-    this.on_click_next_btn = function(){
+    this.on_click_next_btn = function () {
         // alert("next")
-        if(this.cur_page < this.max_page){
+        if (this.cur_page < this.max_page) {
             this.cur_page++
             this.update_table_content_show()
+            this.update_page_show()
         }
     }
 
-    this.on_click_first_page_btn = function(){
+    this.on_click_first_page_btn = function () {
         // alert("first")
         this.cur_page = 0
         this.update_table_content_show()
+        this.update_page_show()
     }
 
-    this.on_click_last_page_btn = function(){
+    this.on_click_last_page_btn = function () {
         // alert("last")
         this.cur_page = this.max_page
         this.update_table_content_show()
+        this.update_page_show()
+    }
+
+    //创建单个输入框
+    this.create_input = function (arg) {
+        var input_block = document.createElement('input')
+        if ("className" in arg) {
+            input_block.className = arg.className
+        }
+        if ("id" in arg) {
+            input_block.id = arg.id
+        }
+        if ("maxLength" in arg) {
+            input_block.maxLength = arg.maxLength
+        }
+        if ("size" in arg) {
+            input_block.size = arg.size
+        }
+        if ("value" in arg) {
+            input_block.value = arg.value
+        }
+        if ("onkeyup" in arg) {
+            input_block.addEventListener('keyup',arg.onkeyup)
+        }
+        if ('onchange' in arg) {
+            input_block.addEventListener('change',arg.onchange)
+        }
+        if ('type' in arg) {
+            input_block.type = arg.type
+        }
+        return input_block
     }
 
     //创建单个按钮
-    this.create_sigle_button = function(btn_name='',btn_class='',btn_id='',func=function(){},mode='click'){
+    this.create_sigle_button = function (arg) {
         var btn = document.createElement('button')
-        if(btn_name.length){
-            var text = document.createTextNode(btn_name)
+        var mode
+        if ("value" in arg) {
+            var text = document.createTextNode(arg.value)
             btn.appendChild(text)
         }
-        if(btn_class.length){
-            btn.className = btn_class
+        if ("className" in arg) {
+            btn.className = arg.className
         }
-        if(btn_id.length){
-            btn.id = btn_id
+        if ("id" in arg) {
+            btn.id = arg.id
+        }
+        if ('mode' in arg) {
+            mode = arg.mode
+        } else {
+            mode = 'click'
         }
         //绑定事件
-        btn.addEventListener(mode,func.bind(this))
+        if ('func' in arg) {
+            btn.addEventListener(mode, arg.func.bind(this))
+        } else {
+            btn.addEventListener(mode, function () { })
+        }
+        btn.type = 'button'
         return btn
     }
+
     //删除特定一行
     this.del_idx_line = function (idx) {
         this.del_all()
-        this.content_data.splice(idx, 1)
+        this.raw_content_data.splice(idx, 1)
+        this.update_show_content_data(this.cur_page)
         this.create_content()
     }
 
@@ -204,6 +275,7 @@ function WebTable(data, id,show_line_num = 10,
     this.del_line = function (object) {
         all_btns = Array.from(document.getElementsByClassName('webtable_btn'))
         btn_idx = all_btns.indexOf(object)
+        btn_idx = btn_idx + this.cur_page * this.show_line_num
         this.del_idx_line(btn_idx)
         // alert("shanchu")
     }
@@ -247,12 +319,36 @@ function WebTable(data, id,show_line_num = 10,
         return tr
     }
 
+    //底部输入框内容改变后
+    this.on_bottom_input_value_change = function () {
+        // console.log("内容改变")
+        var cur_tmp_page = parseInt(this.page_input.value) - 1
+        // if (cur_tmp_page > this.max_page || cur_tmp_page < 0) {
+        //     alert('输入的页码不正确或超出表格范围')
+        // }
+        if(cur_tmp_page > this.max_page){
+            cur_tmp_page = this.max_page
+            this.page_input.value = String(this.max_page + 1)
+        }else if(cur_tmp_page < 0){
+            cur_tmp_page = 0
+            this.page_input.value = '1'
+        }
+        this.cur_page = cur_tmp_page
+        this.update_table_content_show()
+    }
+
+    //更新页码显示
+    this.update_page_show = function () {
+        this.page_input.value = String(this.cur_page + 1)
+    }
+
     //创建一个单元格
     this.create_text = function (elem_data, idx) {
         elem_type = this.header_type[idx]
         var tx
         if (elem_type === 'button') {
             tx = document.createElement('button')
+            tx.type = 'button'
             tx.className = 'webtable_btn' + ' ' + this._col_list[i]
             //给按钮加入文字
             var text = document.createTextNode(elem_data.btn_name)
@@ -278,8 +374,9 @@ function WebTable(data, id,show_line_num = 10,
                 var that = this
                 tx.addEventListener("click", function () {
                     that.del_line(this)
+                    that.update_total_page()
                 })
-            }else if(elem_data.btn_type === 'view'){
+            } else if (elem_data.btn_type === 'view') {
                 if ('func' in elem_data) {
                     tx.addEventListener("click", elem_data.func)
                 } else {
@@ -303,5 +400,15 @@ function WebTable(data, id,show_line_num = 10,
             this.container.removeChild(child_list[0])
         }
         // this.container.removeChild(child_list)
+    }
+
+    this.update_total_page = function(){
+        var tmp = Math.trunc(this.raw_content_data.length / this.show_line_num)
+        if(tmp != this.max_page){
+            this.max_page = tmp
+            this.total_page_div.removeChild(this.total_page_text)
+            this.total_page_text = document.createTextNode('/'+String(this.max_page+1))
+            this.total_page_div.appendChild(this.total_page_text)
+        }
     }
 }
