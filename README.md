@@ -1,6 +1,6 @@
 # WebTable
 
-![](show_pic.png)
+体验：[Document](http://47.111.31.6/webtable/table.html)
 
 介绍：一个简单的由JavaScript实现的网页动态表格，可支持显示文本和按钮。
 
