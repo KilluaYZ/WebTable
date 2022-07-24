@@ -416,6 +416,11 @@ function WebTable(data_arg) {
         } else if (elem_type === 'date') {
             mdate = new MDate(elem_data)
             tx = document.createTextNode(mdate.get_date_str())
+        }else if(elem_type === 'category'){
+            tx = document.createElement('div')
+            text = document.createTextNode(elem_data.content)
+            tx.classList.add(elem_type.class)
+            tx.appendChild(text)
         }
         return tx
     }
@@ -476,7 +481,7 @@ function MDate(arg) {
     if ('format' in arg) {
         format = arg.format
     } else {
-        if (data.length === 2) {
+        if (Object.keys(time_data).length === 2) {
             //yy-mm
             if ('year' in time_data && 'month' in time_data) {
                 format = 'yy-mm'
@@ -491,56 +496,56 @@ function MDate(arg) {
             }
             //h-m
             else if ('hour' in time_data && 'minute' in time_data) {
-                format = 'h-m'
+                format = 'h:m'
             }
             //m-s
             else if ('minute' in time_data && 'second' in time_data) {
-                format = 'm-s'
+                format = 'm:s'
             }
 
-        } else if (data.length === 3) {
+        } else if (Object.keys(time_data).length === 3) {
             //yy-mm-dd
             if ('year' in time_data && 'month' in time_data && 'day' in time_data) {
                 format = 'yy-mm-dd'
             }
             //h-m-s
             else if ('hour' in time_data && 'minute' in time_data && 'second' in time_data) {
-                format = 'h-m-s'
+                format = 'h:m:s'
             }
             //mm-dd-h
             else if ('month' in time_data && 'day' in time_data && 'hour' in time_data) {
-                format = 'mm-dd-h'
+                format = 'mm-dd h'
             }
             //dd-h-m
             else if ('day' in time_data && 'hour' in time_data && 'minute' in time_data) {
-                format = 'dd-h-m'
+                format = 'dd h:m'
             }
-        } else if (data.length === 4) {
+        } else if (Object.keys(time_data).length === 4) {
             //mm-dd-h-m
             if ('month' in time_data && 'day' in time_data && 'hour' in time_data && 'minute' in time_data) {
-                format = 'mm-dd-h-m'
+                format = 'mm-dd h:m'
             }
             //dd-h-m-s
             else if ('day' in time_data && 'hour' in time_data && 'minute' in time_data && 'second' in time_data) {
-                format = 'dd-h-m-s'
+                format = 'dd h:m:s'
             }
 
-        } else if (data.length === 5) {
+        } else if (Object.keys(time_data).length === 5) {
             //yy-mm-dd-h-m
             if ('year' in time_data && 'month' in time_data
                 && 'day' in time_data && 'hour' in time_data
                 && 'minute' in time_data) {
-                format = 'yy-mm-dd-h-m'
+                format = 'yy-mm-dd h:m'
             }
             //mm-dd-h-m-s
             if ('month' in time_data && 'day' in time_data
                 && 'hour' in time_data && 'minute' in time_data
                 && 'second' in time_data) {
-                format = 'mm-dd-h-m-s'
+                format = 'mm-dd h:m:s'
             }
-        } else if (data.length === 6) {
+        } else if (Object.keys(time_data).length === 6) {
             //yy-mm-dd-h-m-s
-            format = 'yy-mm-dd-h-m-s'
+            format = 'yy-mm-dd h:m:s'
         }
     }
 
