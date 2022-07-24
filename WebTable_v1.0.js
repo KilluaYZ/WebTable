@@ -1,21 +1,45 @@
-function WebTable(data, id, show_line_num = 10,
-    table_class_name = 'WebTable',
-    tr_th_class = 'raw_tr_th',
-    tr_td_class = 'raw_tr_td',
-    td_class = 'block_td',
-    th_class = 'block_th') {
-    this.raw_data = data
-    this.header_data = data.header
-    this.raw_content_data = data.content
+function WebTable(data_arg) {
+    this.raw_data = data_arg.data
+    this.header_data = this.raw_data.header
+    this.raw_content_data = this.raw_data.content
     this.content_data = []
-    this.id = id
-    this.table_class_name = table_class_name
-    this.show_line_num = show_line_num
+    this.id = data_arg.id
 
-    this.tr_th_class = tr_th_class
-    this.tr_td_class = tr_td_class
-    this.td_class = td_class
-    this.th_class = th_class
+    if ('table_class_name' in data_arg) {
+        this.table_class_name = data_arg.table_class_name
+    } else {
+        this.table_class_name = 'WebTable'
+    }
+
+    if ('show_line_num' in data_arg) {
+        this.show_line_num = data_arg.show_line_num
+    } else {
+        this.show_line_num = 10
+    }
+
+    if ('tr_th_class' in data_arg) {
+        this.tr_th_class = data_arg.tr_th_class
+    } else {
+        this.tr_th_class = 'raw_tr_th'
+    }
+
+    if ('tr_td_class' in data_arg) {
+        this.tr_td_class = data_arg.tr_td_class
+    } else {
+        this.tr_td_class = 'raw_tr_td'
+    }
+
+    if ('td_class' in data_arg) {
+        this.td_class = data_arg.td_class
+    } else {
+        this.td_class = 'block_td'
+    }
+
+    if ('th_class' in data_arg) {
+        this.th_class = data_arg.th_class
+    } else {
+        this.th_class = 'block_th'
+    }
 
     this.div_container = document.getElementById(this.id)
     this.max_page = Math.trunc(this.raw_content_data.length / this.show_line_num)
@@ -159,7 +183,7 @@ function WebTable(data, id, show_line_num = 10,
         )
 
         this.total_page_div = document.createElement('div')
-        this.total_page_text = document.createTextNode('/' + String(this.max_page+1))
+        this.total_page_text = document.createTextNode('/' + String(this.max_page + 1))
         this.total_page_div.appendChild(this.total_page_text)
 
         bottom_div.appendChild(first_page_btn)
@@ -223,10 +247,10 @@ function WebTable(data, id, show_line_num = 10,
             input_block.value = arg.value
         }
         if ("onkeyup" in arg) {
-            input_block.addEventListener('keyup',arg.onkeyup)
+            input_block.addEventListener('keyup', arg.onkeyup)
         }
         if ('onchange' in arg) {
-            input_block.addEventListener('change',arg.onchange)
+            input_block.addEventListener('change', arg.onchange)
         }
         if ('type' in arg) {
             input_block.type = arg.type
@@ -326,10 +350,10 @@ function WebTable(data, id, show_line_num = 10,
         // if (cur_tmp_page > this.max_page || cur_tmp_page < 0) {
         //     alert('输入的页码不正确或超出表格范围')
         // }
-        if(cur_tmp_page > this.max_page){
+        if (cur_tmp_page > this.max_page) {
             cur_tmp_page = this.max_page
             this.page_input.value = String(this.max_page + 1)
-        }else if(cur_tmp_page < 0){
+        } else if (cur_tmp_page < 0) {
             cur_tmp_page = 0
             this.page_input.value = '1'
         }
@@ -389,8 +413,25 @@ function WebTable(data, id, show_line_num = 10,
             tx = document.createTextNode(String(elem_data))
         } else if (elem_type === 'text') {
             tx = document.createTextNode(elem_data)
+        } else if (elem_type === 'date') {
+            mdate = new MDate(elem_data)
+            tx = document.createTextNode(mdate.get_date_str())
         }
         return tx
+    }
+
+    this.split = function (str, label) {
+        var res = []
+        var len = str.length
+        var tmp = ''
+        for (i = 0; i < len; i++) {
+            if (str[i] == label) {
+                res.push(tmp)
+                tmp = ''
+            }
+            tmp += str[i]
+        }
+        return res
     }
 
     this.del_all = function () {
@@ -402,13 +443,118 @@ function WebTable(data, id, show_line_num = 10,
         // this.container.removeChild(child_list)
     }
 
-    this.update_total_page = function(){
+    this.update_total_page = function () {
         var tmp = Math.trunc(this.raw_content_data.length / this.show_line_num)
-        if(tmp != this.max_page){
+        if (tmp != this.max_page) {
             this.max_page = tmp
             this.total_page_div.removeChild(this.total_page_text)
-            this.total_page_text = document.createTextNode('/'+String(this.max_page+1))
+            this.total_page_text = document.createTextNode('/' + String(this.max_page + 1))
             this.total_page_div.appendChild(this.total_page_text)
         }
+    }
+}
+
+function MDate(arg) {
+    /*
+        Date data form
+        {
+            data:{
+                year: yy,
+                month: mm,
+                day: dd,
+                hour: h,
+                minute: m,
+                second: s
+            },
+            format: 'yy-mm-dd-h-m-s'
+            //format: 'yy年mm月dd日h时m分s秒'
+        }
+        */
+    this.arg = arg
+    var time_data = arg.data
+    var format = ''
+    if ('format' in arg) {
+        format = arg.format
+    } else {
+        if (data.length === 2) {
+            //yy-mm
+            if ('year' in time_data && 'month' in time_data) {
+                format = 'yy-mm'
+            }
+            //mm-dd
+            else if ('month' in time_data && 'day' in time_data) {
+                format = 'mm-dd'
+            }
+            //dd-h
+            else if ('day' in time_data && 'hour' in time_data) {
+                format = 'dd-h'
+            }
+            //h-m
+            else if ('hour' in time_data && 'minute' in time_data) {
+                format = 'h-m'
+            }
+            //m-s
+            else if ('minute' in time_data && 'second' in time_data) {
+                format = 'm-s'
+            }
+
+        } else if (data.length === 3) {
+            //yy-mm-dd
+            if ('year' in time_data && 'month' in time_data && 'day' in time_data) {
+                format = 'yy-mm-dd'
+            }
+            //h-m-s
+            else if ('hour' in time_data && 'minute' in time_data && 'second' in time_data) {
+                format = 'h-m-s'
+            }
+            //mm-dd-h
+            else if ('month' in time_data && 'day' in time_data && 'hour' in time_data) {
+                format = 'mm-dd-h'
+            }
+            //dd-h-m
+            else if ('day' in time_data && 'hour' in time_data && 'minute' in time_data) {
+                format = 'dd-h-m'
+            }
+        } else if (data.length === 4) {
+            //mm-dd-h-m
+            if ('month' in time_data && 'day' in time_data && 'hour' in time_data && 'minute' in time_data) {
+                format = 'mm-dd-h-m'
+            }
+            //dd-h-m-s
+            else if ('day' in time_data && 'hour' in time_data && 'minute' in time_data && 'second' in time_data) {
+                format = 'dd-h-m-s'
+            }
+
+        } else if (data.length === 5) {
+            //yy-mm-dd-h-m
+            if ('year' in time_data && 'month' in time_data
+                && 'day' in time_data && 'hour' in time_data
+                && 'minute' in time_data) {
+                format = 'yy-mm-dd-h-m'
+            }
+            //mm-dd-h-m-s
+            if ('month' in time_data && 'day' in time_data
+                && 'hour' in time_data && 'minute' in time_data
+                && 'second' in time_data) {
+                format = 'mm-dd-h-m-s'
+            }
+        } else if (data.length === 6) {
+            //yy-mm-dd-h-m-s
+            format = 'yy-mm-dd-h-m-s'
+        }
+    }
+
+    //get date string through format
+    format = format.replace('yy', String(time_data.year))
+    format = format.replace('mm', String(time_data.month))
+    format = format.replace('dd', String(time_data.day))
+    format = format.replace('h', String(time_data.hour))
+    format = format.replace('m', String(time_data.minute))
+    format = format.replace('s', String(time_data.second))
+
+    this.date_str = format
+
+    this.get_date_str = function () {
+        return this.date_str
     }
 }
