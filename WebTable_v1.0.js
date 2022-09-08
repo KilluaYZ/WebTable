@@ -20,13 +20,13 @@ function WebTable(data_arg) {
     if ('tr_th_class' in data_arg) {
         this.tr_th_class = data_arg.tr_th_class
     } else {
-        this.tr_th_class = 'raw_tr_th'
+        this.tr_th_class = 'row_tr_th'
     }
 
     if ('tr_td_class' in data_arg) {
         this.tr_td_class = data_arg.tr_td_class
     } else {
-        this.tr_td_class = 'raw_tr_td'
+        this.tr_td_class = 'row_tr_td'
     }
 
     if ('td_class' in data_arg) {
@@ -419,7 +419,7 @@ function WebTable(data_arg) {
         }else if(elem_type === 'category'){
             tx = document.createElement('div')
             text = document.createTextNode(elem_data.content)
-            tx.classList.add(elem_type.class)
+            tx.classList.add(elem_type.className)
             tx.appendChild(text)
         }
         return tx

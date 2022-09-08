@@ -16,8 +16,8 @@
     text-align: center;
 }
 
-.raw_tr_th,
-.raw_tr_td {
+.row_tr_th,
+.row_tr_td {
     height: fit-content;
     border-style: solid;
     border-bottom-width: 1px;
@@ -35,11 +35,11 @@
     padding:5px;
 }
 
-.raw_tr_th {
+.row_tr_th {
     background-color: grey;
 }
 
-.raw_tr_td:nth-child(odd) {
+.row_tr_td:nth-child(odd) {
     background-color: rgb(167, 215, 249);
 }
 

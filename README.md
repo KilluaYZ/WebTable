@@ -94,25 +94,31 @@
 
 另一个参数id是对应了div的id，在使用时，需要先创建一个div标签和对应id，然后再实例化WebTable类时，id就是该table标签的id。
 
-
-
 ps：WebTable的参数如下
 
 ```javascript
 WebTable(data, id, show_line_num = 10,
     table_class_name = 'WebTable',
-    tr_th_class = 'raw_tr_th',
-    tr_td_class = 'raw_tr_td',
+    tr_th_class = 'row_tr_th',
+    tr_td_class = 'row_tr_td',
     td_class = 'block_td',
     th_class = 'block_th')
 ```
 
-其中表头行的class为tr_th_class = 'raw_tr_th'，单元格的class为th_class = 'block_th'
+其中表头行的class为tr_th_class = 'row_tr_th'，单元格的class为th_class = 'block_th'
 
-表体行的class为tr_td_class = 'raw_tr_td'，列的class默认为"col_<列号>"，列好从0开始，单元格的class为td_class = 'block_td'
+表体行的class为tr_td_class = 'row_tr_td'，列的class默认为"col_<列号>"，列好从0开始，单元格的class为td_class = 'block_td'
 
 show_line_num是每页展示的条目数
 
-
-
 可以通过2959243019@qq.com联系我~
+
+
+版本更新：
+
+
+
+
+v1.0
+
+实现基本功能
