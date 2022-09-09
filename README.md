@@ -36,7 +36,17 @@
                 },
                 {
                     name:'商品名称',
-                    type:'text'
+                    type:'text'，
+		    	special_class:{
+                	class:['so_exp'],
+                	mode:'row',
+                	condition:function(val){
+                    		if(val > 500){
+                        		return true;
+                    		}
+                    		return false;
+                	}
+            		}
                 },
                 {
                     name:'商品价格',
