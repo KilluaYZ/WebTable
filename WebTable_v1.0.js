@@ -1,3 +1,35 @@
+function MVLOG(lvl) {
+    this.lvl = lvl;
+    switch (this.lvl) {
+        case 'WARNING':
+            this.prev = '[WARNING]'
+            this.terminal = false;
+            break;
+        case 'ERROR':
+            this.prev = '[ERROR]'
+            this.terminal = true;
+            break;
+        case 'INFO':
+            this.prev = '[INFO]'
+            this.terminal = false;
+            break;
+        case 'DEBUG':
+            this.prev = '[DEBUG]'
+            this.terminal = false;
+            break;
+    }
+    this.prev += ' WebTable : ';
+
+    this.log = function(message){
+        var logout = prev+message;
+        console.log(logout);
+        if(this.terminal){
+            alert(logout);
+            throw new Error(logout)
+        }
+    }
+}
+
 function WebTable(data_arg) {
     this.raw_data = data_arg.data
     this.header_data = this.raw_data.header
@@ -43,6 +75,9 @@ function WebTable(data_arg) {
 
     this.div_container = document.getElementById(this.id)
     this.max_page = Math.trunc(this.raw_content_data.length / this.show_line_num)
+    if (this.raw_content_data.length % this.show_line_num == 0) {
+        this.max_page -= 1;
+    }
 
     this.init = function () {
         console.log('start')
@@ -313,7 +348,8 @@ function WebTable(data_arg) {
                 //创建元素
                 var t_label = document.createElement(_label)
                 //赋予class 和 id
-                t_label.className = this.td_class + ' ' + this._col_list[i]
+                //t_label.className = this.td_class + ' ' + this._col_list[i]
+                t_label.classList.add(this._col_list[i])
                 //创建textnode
                 // var text = document.createTextNode(String(line_data[i]))
                 var text = this.create_text(line_data[i], i)
@@ -322,25 +358,79 @@ function WebTable(data_arg) {
                 //将td接到tr上
                 tr.appendChild(t_label)
             }
-
+            tr = this.add_special_class_name(tr);
         } else if (_label === 'th') {
             tr.className = this.tr_th_class
             for (i = 0; i < line_data.length; i++) {
                 //创建元素
-                var t_label = document.createElement(_label)
+                var t_label = document.createElement(_label);
                 //赋予class 和 id
-                t_label.className = this.th_class
-                t_label.tagName = this.th_name
+                t_label.className = this.th_class;
+                t_label.tagName = this.th_name;
                 //创建textnode
-                var text = document.createTextNode(String(line_data[i]))
+                var text = document.createTextNode(String(line_data[i]));
                 // var text = this.create_text(line_data[i],i)
                 //将textnode接到td上
-                t_label.appendChild(text)
+                t_label.appendChild(text);
                 //将td接到tr上
-                tr.appendChild(t_label)
+                tr.appendChild(t_label);
             }
         }
+        
         return tr
+    }
+
+    this.add_special_class_name = function(tr){
+        //无论输入什么值，只返回true的函数
+        this.always_return_true_func = function (val) {
+            return true;
+        }
+
+        this.header_data.forEach((header_element,index) => {
+            if ('special_class' in header_element) {
+                var tmp = header_element['special_class'];
+                var mode;
+                var class_name_list;
+                var condition_func;
+
+                if ('mode' in tmp) {
+                    mode = tmp['mode'];
+                }else{
+                    mode = 'row';
+                }
+
+                if ('condition' in tmp) {
+                    if(tmp['condition']){
+                        condition_func = tmp['condition'];
+                    }else{
+                        condition_func = this.always_return_true_func;
+                    }
+                }else {
+                    condition_func = this.always_return_true_func;
+                }
+                
+                if('class' in tmp){
+                    class_name_list = tmp['class'];
+                }else{
+                    class_name_list = [];
+                }
+
+                if(condition_func(tr.childNodes[index].firstChild.textContent)){
+                    if(mode === 'row'){
+                        tr.childNodes.forEach((td_elem) => {
+                            class_name_list.forEach((class_name) => {
+                                td_elem.classList.add(class_name)
+                            })
+                        });
+                    }else{
+                        class_name_list.forEach((class_name) => {
+                            tr.childNodes[index].classList.add(class_name)
+                        });
+                    }
+                }
+            }
+        });
+        return tr;
     }
 
     //底部输入框内容改变后
@@ -373,7 +463,9 @@ function WebTable(data_arg) {
         if (elem_type === 'button') {
             tx = document.createElement('button')
             tx.type = 'button'
-            tx.className = 'webtable_btn' + ' ' + this._col_list[i]
+            // tx.className = 'webtable_btn' + ' ' + this._col_list[i]
+            tx.classList.add('webtable_btn')
+            tx.classList.add(this._col_list[i])
             //给按钮加入文字
             var text = document.createTextNode(elem_data.btn_name)
             tx.appendChild(text)
@@ -416,7 +508,7 @@ function WebTable(data_arg) {
         } else if (elem_type === 'date') {
             mdate = new MDate(elem_data)
             tx = document.createTextNode(mdate.get_date_str())
-        }else if(elem_type === 'category'){
+        } else if (elem_type === 'category') {
             tx = document.createElement('div')
             text = document.createTextNode(elem_data.content)
             tx.classList.add(elem_type.className)
