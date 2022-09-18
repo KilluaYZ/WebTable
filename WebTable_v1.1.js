@@ -1,35 +1,3 @@
-function MVLOG(lvl) {
-    this.lvl = lvl;
-    switch (this.lvl) {
-        case 'WARNING':
-            this.prev = '[WARNING]'
-            this.terminal = false;
-            break;
-        case 'ERROR':
-            this.prev = '[ERROR]'
-            this.terminal = true;
-            break;
-        case 'INFO':
-            this.prev = '[INFO]'
-            this.terminal = false;
-            break;
-        case 'DEBUG':
-            this.prev = '[DEBUG]'
-            this.terminal = false;
-            break;
-    }
-    this.prev += ' WebTable : ';
-
-    this.log = function(message){
-        var logout = prev+message;
-        console.log(logout);
-        if(this.terminal){
-            alert(logout);
-            throw new Error(logout)
-        }
-    }
-}
-
 function WebTable(data_arg) {
     this.raw_data = data_arg.data
     this.header_data = this.raw_data.header
@@ -73,14 +41,20 @@ function WebTable(data_arg) {
         this.th_class = 'block_th'
     }
 
-    this.div_container = document.getElementById(this.id)
-    this.max_page = Math.trunc(this.raw_content_data.length / this.show_line_num)
-    if (this.raw_content_data.length % this.show_line_num == 0) {
-        this.max_page -= 1;
+    //更新最大页码数
+    this.update_max_page = function () {
+        this.max_page = Math.trunc(this.raw_content_data.length / this.show_line_num)
+        if (this.raw_content_data.length % this.show_line_num == 0) {
+            this.max_page -= 1;
+        }
     }
+
+    this.div_container = document.getElementById(this.id);
+    
 
     this.init = function () {
         console.log('start')
+        this.update_max_page();
         //解析数据，验证其正确性
         //类型
 
@@ -97,6 +71,24 @@ function WebTable(data_arg) {
             this.create_botton_menu()
         }
     }
+
+    //更改raw_data后重新更新表内容，但不改变表头等
+    this.update_raw_data = function(data){
+        if(data.length <= 0){
+            throw Error("[ERROR] WebTable :: this.update_raw_data :: the data is empty!");
+        }
+        if(data[0].length != this.header_data.length){
+            throw Error("[ERROR] WebTable :: this.update_raw_data :: the data is not fit with header!");
+        }
+        this.raw_content_data = data;
+        // this.update_max_page();
+        this.init_show_content_data();
+        this.update_table_content_show();
+        this.update_page_show();
+        this.update_total_page();
+    }
+
+    
 
     //创建表格
     this.create_table = function () {
@@ -376,17 +368,17 @@ function WebTable(data_arg) {
                 tr.appendChild(t_label);
             }
         }
-        
+
         return tr
     }
 
-    this.add_special_class_name = function(tr){
+    this.add_special_class_name = function (tr) {
         //无论输入什么值，只返回true的函数
         this.always_return_true_func = function (val) {
             return true;
         }
 
-        this.header_data.forEach((header_element,index) => {
+        this.header_data.forEach((header_element, index) => {
             if ('special_class' in header_element) {
                 var tmp = header_element['special_class'];
                 var mode;
@@ -395,34 +387,34 @@ function WebTable(data_arg) {
 
                 if ('mode' in tmp) {
                     mode = tmp['mode'];
-                }else{
+                } else {
                     mode = 'row';
                 }
 
                 if ('condition' in tmp) {
-                    if(tmp['condition']){
+                    if (tmp['condition']) {
                         condition_func = tmp['condition'];
-                    }else{
+                    } else {
                         condition_func = this.always_return_true_func;
                     }
-                }else {
+                } else {
                     condition_func = this.always_return_true_func;
                 }
-                
-                if('class' in tmp){
+
+                if ('class' in tmp) {
                     class_name_list = tmp['class'];
-                }else{
+                } else {
                     class_name_list = [];
                 }
 
-                if(condition_func(tr.childNodes[index].firstChild.textContent)){
-                    if(mode === 'row'){
+                if (condition_func(tr.childNodes[index].firstChild.textContent)) {
+                    if (mode === 'row') {
                         tr.childNodes.forEach((td_elem) => {
                             class_name_list.forEach((class_name) => {
                                 td_elem.classList.add(class_name)
                             })
                         });
-                    }else{
+                    } else {
                         class_name_list.forEach((class_name) => {
                             tr.childNodes[index].classList.add(class_name)
                         });
@@ -488,9 +480,14 @@ function WebTable(data_arg) {
                 }
             } else if (elem_data.btn_type === 'del') {
                 var that = this
+                var aux_func = function(obj){};
+                if('func' in elem_data){
+                    aux_func = elem_data.func;
+                }
                 tx.addEventListener("click", function () {
-                    that.del_line(this)
-                    that.update_total_page()
+                    aux_func(this);
+                    that.del_line(this);
+                    that.update_total_page();
                 })
             } else if (elem_data.btn_type === 'view') {
                 if ('func' in elem_data) {
@@ -542,6 +539,9 @@ function WebTable(data_arg) {
 
     this.update_total_page = function () {
         var tmp = Math.trunc(this.raw_content_data.length / this.show_line_num)
+        if(this.raw_content_data.length % this.show_line_num == 0){
+            tmp = tmp - 1;
+        }
         if (tmp != this.max_page) {
             this.max_page = tmp
             this.total_page_div.removeChild(this.total_page_text)
